@@ -114,7 +114,7 @@ end;
 procedure TCodeRegistry.AddConfirmedHighValueOrders;
 const
   CODE =  '''
-          { Example 3: intermediate }
+          { Example 3: composed }
 
           // Order Service
 
@@ -144,7 +144,7 @@ end;
 procedure TCodeRegistry.AddPriorityInternationalOrders;
 const
   CODE =  '''
-          { Example 4: intermediate }
+          { Example 4: composed }
 
           // Order Service
 
@@ -174,7 +174,7 @@ end;
 procedure TCodeRegistry.AddUnconfirmedHighRiskInternationalOrders;
 const
   CODE =  '''
-          { Example 5: intermediate }
+          { Example 5: composed }
 
           // Order Service
 
@@ -210,7 +210,7 @@ end;
 procedure TCodeRegistry.AddOrdersNeedingSpecialHandling;
 const
   CODE =  '''
-          { Example 6: intermediate }
+          { Example 6: composed }
 
           // Order Service
 
