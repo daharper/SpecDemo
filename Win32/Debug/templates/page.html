@@ -1,0 +1,179 @@
+ <!DOCTYPE html>
+
+<html lang="en" data-bs-theme="dark">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="bootstrap-icons.min.css">
+    <link rel="stylesheet" href="vs2015.min.css">
+    <script src="bootstrap.bundle.min.js"></script>
+    <script src="highlight.min.js"></script>
+    <style>
+      /* 1. Keep the scrollbar track visible so the window width NEVER changes */
+      html {
+        scrollbar-gutter: stable !important;
+        overflow-y: scroll !important;
+      }
+
+      /* 2. Total Lock: Stop Bootstrap from adding ANY padding or margins */
+      body.modal-open, 
+      .sticky-top, 
+      .is-fixed {
+        padding-right: 0 !important;
+        margin-right: 0 !important;
+      }
+
+      /* 3. THE FIX: Lock the Sidebar (Aside) to an exact pixel width */
+      aside#reports {
+        width: 350px !important;
+        min-width: 350px !important;
+        max-width: 350px !important;
+        flex: none !important; /* This is the "magic" that stops grid expansion */
+        margin-right: 0 !important;
+        padding-right: 15px !important;
+      }
+
+      main {
+        width: 850px !important;
+        min-width: 850px !important;
+        max-width: 850px !important;
+        flex: 0 0 850px !important;
+        padding-left: 20px !important; /* Space between sidebar and text */
+      }
+
+      /* 4. Ensure the Row doesn't try to be fluid */
+      .row {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        width: 1150px !important; /* Sum of Aside + Main */
+        margin: 0 !important;
+      }       
+
+      .modal-backdrop {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+      } 
+
+      /* 1. The Sidebar: Keep it visible but behind the Dark Fade */
+      aside#reports {
+          z-index: 1030 !important; /* Higher than content, but lower than Fade */
+          position: sticky !important;
+          top: 20px !important;
+      }
+
+      /* 2. The Dark Fade (Backdrop): Sits in the middle */
+      .modal-backdrop {
+          z-index: 1040 !important;
+          position: fixed !important;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+      }
+
+      /* 3. The Modal Popup: Sits on the very top */
+      .modal {
+          z-index: 1050 !important;
+      } 
+    </style>
+  </head>
+  <body class="p-4" style="font-size: 0.9rem;">
+
+    <div class="container-fluid">
+      <div class="row">
+        <aside id="reports" class="sticky-top is-fixed">
+         
+          <div class="sticky-top is-fixed">
+            <div class="list-group">
+              [LINKS]
+            </div>
+             
+            <div class="mt-4 ps-3">
+              <small class="text-uppercase text-muted fw-bold" 
+                     style="letter-spacing: 1px; font-size: 0.7rem;">
+                Code Samples
+             </small>
+            </div> 
+
+            <div class="list-group mt-2">
+              <a href="javascript:void(0)" 
+                 class="list-group-item list-group-item-action"
+                 data-bs-toggle="modal" 
+                 data-bs-target="#infoModal" 
+                 data-bs-title="DynamicObject Example" 
+                 data-bs-text="[DYNAMIC]">
+                 DynamicObject
+              </a>
+              <a href="javascript:void(0)" 
+                 class="list-group-item list-group-item-action"
+                 data-bs-toggle="modal" 
+                 data-bs-target="#infoModal" 
+                 data-bs-title="Stream Example" 
+                 data-bs-text="[STREAM]">
+                 Stream
+              </a>    
+              <a href="javascript:void(0)" 
+                 class="list-group-item list-group-item-action"
+                 data-bs-toggle="modal" 
+                 data-bs-target="#infoModal" 
+                 data-bs-title="Scope Example" 
+                 data-bs-text="[SCOPE]">
+                 Scope
+              </a>                    
+            </div>
+          </div>                 
+        </aside>
+        <main>
+            [CONTENT]
+        </main>
+      </div>      
+    </div>    
+
+    <div class="modal fade" id="infoModal" tabindex="-1">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-dark text-muted border-secondary">
+            <h5 class="modal-title font-monospace" id="modalTitle">Source Code</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body p-0" style="background-color: #1a1d20;">
+            <pre class="m-0"><code id="modalContent" class="language-delphi">                 
+              <!-- Code is injected here -->
+            </code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const infoModal = document.getElementById('infoModal');
+
+      infoModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+
+        // 1. Get the data from the attributes
+        const titleText = button.getAttribute('data-bs-title');
+        const bodyText = button.getAttribute('data-bs-text');
+
+        // 2. Find the elements in the modal
+        const modalTitle = infoModal.querySelector('#modalTitle');
+
+        modalBody = infoModal.querySelector('#modalContent');
+        modalBody.className = 'language-delphi';
+
+        // 3. Inject the new content
+        modalTitle.textContent = titleText;
+        modalBody.textContent = bodyText;
+
+        delete modalBody.dataset.highlighted;
+
+        hljs.highlightElement(modalBody);
+      });
+    </script> 
+
+  </body>
+</html>
