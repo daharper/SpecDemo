@@ -448,7 +448,7 @@ const
             // ...
           end;
 
-          // Building the sections of the report dynamically
+          // Building the sections of the report dynamically - todo: simplify argument handling
 
           function TOrderReport.MethodMissing(const aName: string; const aHint: TInvokeHint; const aArgs...)
           begin
@@ -463,10 +463,10 @@ const
             fSections.Add(section);
           end;
 
-          // Adding report items dynamically
+          // Adding report sections dynamically
 
-          report.HighValueOrders     := service.GetHighValueOrders;
-          report.InternationalOrders := service.GetInternationalOrders;
+          section.HighValueOrders     := service.GetHighValueOrders;
+          section.InternationalOrders := service.GetInternationalOrders;
 
           ''';
 begin
