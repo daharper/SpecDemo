@@ -18,6 +18,9 @@ type
     function Spec: ISpecification<TOrder>;
   end;
 
+  /// <summary>
+  ///  Represents a section of the report, for example: international orders.
+  /// </summary>
   TOrderReportItem = class(TInterfacedObject, IOrderReportItem)
   private
     fName:  string;
@@ -33,6 +36,9 @@ type
     constructor Create(const aName: string; const aTitle: string; const aCode: string; const aSpec: ISpecification<TOrder>);
   end;
 
+  /// <summary>
+  ///  Represents the order report, contains a number of report items.
+  /// </summary>
   TOrderReport = class(TDynamicObject)
   private
     fItems: TList<IOrderReportItem>;

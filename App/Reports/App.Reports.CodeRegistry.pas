@@ -6,6 +6,9 @@ uses
   System.Generics.Collections;
 
 type
+  /// <summary>
+  ///  A simple registry for code samples.
+  /// </summary>
   TCodeRegistry = class
   private
     fCode: TDictionary<string, string>;

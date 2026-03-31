@@ -10,6 +10,9 @@ uses
   Domain.Orders.Specifications;
 
 type
+  /// <summary>
+  ///  The business service for our orders.
+  /// </summary>
   TOrderService = class
   public
     function GetHighValueOrders: ISpecification<TOrder>;
@@ -33,8 +36,6 @@ type
     function GetPremiumInternationalOrders: ISpecification<TOrder>;
     function GetTrustedSpecialHandlingOrders: ISpecification<TOrder>;
     function GetOrdersForEscalatedReview: ISpecification<TOrder>;
-  public
-
   end;
 
 implementation

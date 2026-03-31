@@ -6,6 +6,9 @@ uses
   System.Generics.Collections;
 
 type
+  /// <summary>
+  ///  The order details for our domain.
+  /// </summary>
   TOrder = record
     Id: Integer;
     CustomerName: string;

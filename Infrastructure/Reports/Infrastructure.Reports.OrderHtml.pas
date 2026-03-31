@@ -8,6 +8,9 @@ uses
 type
   TTemplate = (ttPage, ttLink, ttTable, ttRow);
 
+  /// <summary>
+  ///  Renders the order report and its items to HTML.
+  /// </summary>
   TOrdersHtmlRenderer = class
   private
     class function GetTemplate(const aTemplate: TTemplate): string;
@@ -35,6 +38,7 @@ uses
 
 { TOrdersHtmlGenerator }
 
+{----------------------------------------------------------------------------------------------------------------------}
 class function TOrdersHtmlRenderer.Execute(const aReport: TOrderReport): string;
 const
   PAID: array[boolean] of string = ('', 'bg-success');
