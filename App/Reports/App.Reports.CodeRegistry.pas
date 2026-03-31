@@ -431,6 +431,8 @@ const
                               .Replace('[TEXT]',  TEXT[o.PaymentConfirmed]);
                 rows := rows + row;
               end);
+
+
           ''';
 begin
   fCode.Add('Stream', CODE);
@@ -446,7 +448,7 @@ const
             // ...
           end;
 
-          // Building the report dynamically
+          // Building the sections of the report dynamically
 
           function TOrderReport.MethodMissing(const aName: string; const aHint: TInvokeHint; const aArgs...)
           begin
@@ -455,9 +457,10 @@ const
             var spec  := IUnknown(aArgs[0]) as ISpecification<TOrder>;
             var title := ToTitle(aName);
             var code  := CodeRegistry[aName];
-            var item  := TOrderReportItem.Create(aName, title, code, spec);
 
-            fItems.Add(item);
+            var section := TOrderReportSection.Create(aName, title, code, spec);
+
+            fSections.Add(section);
           end;
 
           // Adding report items dynamically
