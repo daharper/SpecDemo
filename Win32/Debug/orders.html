@@ -138,24 +138,29 @@ section.InternationalOrders := service.GetInternationalOrders;
                  data-bs-toggle="modal" 
                  data-bs-target="#infoModal" 
                  data-bs-title="Stream Example" 
-                 data-bs-text="{ using Stream to build the table rows }
+                 data-bs-text="{ using Stream to build the report sections }
 
-Stream
-  .From<TOrder>(Orders)
-  .Filter(item.Spec)
-  .ForEach(
-    procedure(const o: TOrder)
-    begin
-      var row := rowTemplate
-                    .Replace('[ID]',    o.Id.ToString)
-                    .Replace('[NAME]',  o.CustomerName)
-                    .Replace('[TOTAL]', o.TotalAmount.ToString)
-                    .Replace('[PAID]',  PAID[o.PaymentConfirmed])
-                    .Replace('[TEXT]',  TEXT[o.PaymentConfirmed]);
-      rows := rows + row;
-    end);
+for var section in aReport do
+begin
+  var rows := '';
 
-">
+  Stream
+    .From<TOrder>(Orders)
+    .Filter(section.Spec)
+    .ForEach(
+      procedure(const o: TOrder)
+      begin
+        var row := rowTemplate
+                  .Replace('[ID]',    o.Id.ToString)
+                  .Replace('[NAME]',  o.CustomerName)
+                  .Replace('[TOTAL]', o.TotalAmount.ToString)
+                  .Replace('[PAID]',  PAID[o.PaymentConfirmed])
+                  .Replace('[TEXT]',  TEXT[o.PaymentConfirmed]);
+        rows := rows + row;
+      end);
+
+  // ....
+end;">
                  Stream
               </a>    
               <a href="javascript:void(0)" 

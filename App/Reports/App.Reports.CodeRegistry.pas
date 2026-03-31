@@ -415,24 +415,29 @@ end;
 procedure TCodeRegistry.AddStream;
 const
   CODE =  '''
-          { using Stream to build the table rows }
+          { using Stream to build the report sections }
 
-          Stream
-            .From<TOrder>(Orders)
-            .Filter(item.Spec)
-            .ForEach(
-              procedure(const o: TOrder)
-              begin
-                var row := rowTemplate
-                              .Replace('[ID]',    o.Id.ToString)
-                              .Replace('[NAME]',  o.CustomerName)
-                              .Replace('[TOTAL]', o.TotalAmount.ToString)
-                              .Replace('[PAID]',  PAID[o.PaymentConfirmed])
-                              .Replace('[TEXT]',  TEXT[o.PaymentConfirmed]);
-                rows := rows + row;
-              end);
+          for var section in aReport do
+          begin
+            var rows := '';
 
+            Stream
+              .From<TOrder>(Orders)
+              .Filter(section.Spec)
+              .ForEach(
+                procedure(const o: TOrder)
+                begin
+                  var row := rowTemplate
+                            .Replace('[ID]',    o.Id.ToString)
+                            .Replace('[NAME]',  o.CustomerName)
+                            .Replace('[TOTAL]', o.TotalAmount.ToString)
+                            .Replace('[PAID]',  PAID[o.PaymentConfirmed])
+                            .Replace('[TEXT]',  TEXT[o.PaymentConfirmed]);
+                  rows := rows + row;
+                end);
 
+            // ....
+          end;
           ''';
 begin
   fCode.Add('Stream', CODE);

@@ -9,7 +9,7 @@ type
   TTemplate = (ttPage, ttLink, ttSection, ttRow);
 
   /// <summary>
-  ///  Renders the order report and its items to HTML.
+  ///  Renders the order report and its sections to HTML.
   /// </summary>
   TOrdersHtmlRenderer = class
   private
@@ -56,38 +56,38 @@ begin
   var links   := '';
   var i       := 0;
 
-  for var item in aReport do
+  for var section in aReport do
   begin
     var rows := '';
 
     Stream
       .From<TOrder>(Orders)
-      .Filter(item.Spec)
+      .Filter(section.Spec)
       .ForEach(
         procedure(const o: TOrder)
         begin
           var row := rowTemplate
-                        .Replace('[ID]',    o.Id.ToString)
-                        .Replace('[NAME]',  o.CustomerName)
-                        .Replace('[TOTAL]', o.TotalAmount.ToString)
-                        .Replace('[PAID]',  PAID[o.PaymentConfirmed])
-                        .Replace('[TEXT]',  TEXT[o.PaymentConfirmed]);
+                    .Replace('[ID]',    o.Id.ToString)
+                    .Replace('[NAME]',  o.CustomerName)
+                    .Replace('[TOTAL]', o.TotalAmount.ToString)
+                    .Replace('[PAID]',  PAID[o.PaymentConfirmed])
+                    .Replace('[TEXT]',  TEXT[o.PaymentConfirmed]);
           rows := rows + row;
         end);
 
     Inc(i);
 
-    var section := sectionTemplate
+    var sect := sectionTemplate
                     .Replace('[SEC_ID]', i.ToString)
-                    .Replace('[TITLE]',  item.Title)
-                    .Replace('[CODE]',   item.Code)
+                    .Replace('[TITLE]',  section.Title)
+                    .Replace('[CODE]',   section.Code)
                     .Replace('[ROWS]',   rows);
 
     var lnk := linkTemplate
                     .Replace('[SEC_ID]', i.ToString)
-                    .Replace('[TITLE]',  item.Title);
+                    .Replace('[TITLE]',  section.Title);
 
-    content := content + section;
+    content := content + sect;
     links := links + lnk;
   end;
 
