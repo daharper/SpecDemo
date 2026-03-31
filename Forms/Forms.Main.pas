@@ -14,8 +14,6 @@ type
     procedure FormShow(Sender: TObject);
   private
     fHtmlPath: string;
-
-    procedure RenderReport(const aReport: TOrderReport);
   public
     { Public declarations }
   end;
@@ -66,13 +64,7 @@ begin
   report.TrustedSpecialHandlingOrders           := service.GetTrustedSpecialHandlingOrders;
   report.OrdersForEscalatedReview               := service.GetOrdersForEscalatedReview;
 
-  RenderReport(orderReport);
-end;
-
-{----------------------------------------------------------------------------------------------------------------------}
-procedure TMainForm.RenderReport(const aReport: TOrderReport);
-begin
-  fHtmlPath := TOrdersHtmlRenderer.Execute(aReport);
+  fHtmlPath := TOrdersHtmlRenderer.Execute(orderReport);
 
   Browser.CreateWebView;
 end;
