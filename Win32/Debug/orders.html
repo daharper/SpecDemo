@@ -1,0 +1,1158 @@
+﻿ <!DOCTYPE html>
+
+<html lang="en" data-bs-theme="dark">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="bootstrap-icons.min.css">
+    <link rel="stylesheet" href="vs2015.min.css">
+    <script src="bootstrap.bundle.min.js"></script>
+    <script src="highlight.min.js"></script>
+    <style>
+      /* 1. Keep the scrollbar track visible so the window width NEVER changes */
+      html {
+        scrollbar-gutter: stable !important;
+        overflow-y: scroll !important;
+      }
+
+      /* 2. Total Lock: Stop Bootstrap from adding ANY padding or margins */
+      body.modal-open, 
+      .sticky-top, 
+      .is-fixed {
+        padding-right: 0 !important;
+        margin-right: 0 !important;
+      }
+
+      /* 3. THE FIX: Lock the Sidebar (Aside) to an exact pixel width */
+      aside#reports {
+        width: 350px !important;
+        min-width: 350px !important;
+        max-width: 350px !important;
+        flex: none !important; /* This is the "magic" that stops grid expansion */
+        margin-right: 0 !important;
+        padding-right: 15px !important;
+      }
+
+      main {
+        width: 850px !important;
+        min-width: 850px !important;
+        max-width: 850px !important;
+        flex: 0 0 850px !important;
+        padding-left: 20px !important; /* Space between sidebar and text */
+      }
+
+      /* 4. Ensure the Row doesn't try to be fluid */
+      .row {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        width: 1150px !important; /* Sum of Aside + Main */
+        margin: 0 !important;
+      }       
+
+      .modal-backdrop {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+      } 
+
+      /* 1. The Sidebar: Keep it visible but behind the Dark Fade */
+      aside#reports {
+          z-index: 1030 !important; /* Higher than content, but lower than Fade */
+          position: sticky !important;
+          top: 20px !important;
+      }
+
+      /* 2. The Dark Fade (Backdrop): Sits in the middle */
+      .modal-backdrop {
+          z-index: 1040 !important;
+          position: fixed !important;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+      }
+
+      /* 3. The Modal Popup: Sits on the very top */
+      .modal {
+          z-index: 1050 !important;
+      } 
+    </style>
+  </head>
+  <body class="p-4" style="font-size: 0.9rem;">
+
+    <div class="container-fluid">
+      <div class="row">
+        <aside id="reports" class="sticky-top is-fixed">
+         
+          <div class="sticky-top is-fixed">
+            <div class="list-group">
+              <a href="#section1" class="list-group-item list-group-item-action">High Value Orders</a><a href="#section2" class="list-group-item list-group-item-action">International Orders</a><a href="#section3" class="list-group-item list-group-item-action">Confirmed High Value Orders</a><a href="#section4" class="list-group-item list-group-item-action">Priority International Orders</a><a href="#section5" class="list-group-item list-group-item-action">Unconfirmed High Risk International Orders</a><a href="#section6" class="list-group-item list-group-item-action">Orders Needing Special Handling</a><a href="#section7" class="list-group-item list-group-item-action">Orders Ready For Priority Fulfillment</a><a href="#section8" class="list-group-item list-group-item-action">Premium International Orders</a><a href="#section9" class="list-group-item list-group-item-action">Trusted Special Handling Orders</a><a href="#section10" class="list-group-item list-group-item-action">Orders For Escalated Review</a>
+            </div>
+             
+            <div class="mt-4 ps-3">
+              <small class="text-uppercase text-muted fw-bold" 
+                     style="letter-spacing: 1px; font-size: 0.7rem;">
+                Code Samples
+             </small>
+            </div> 
+
+            <div class="list-group mt-2">
+              <a href="javascript:void(0)" 
+                 class="list-group-item list-group-item-action"
+                 data-bs-toggle="modal" 
+                 data-bs-target="#infoModal" 
+                 data-bs-title="DynamicObject Example" 
+                 data-bs-text="{ Using DynamicObject for the report }
+
+TOrderReport = class(TDynamicObject)
+  // ...
+end;
+
+// Building the report dynamically
+
+function TOrderReport.MethodMissing(const aName: string; const aHint: TInvokeHint; const aArgs...)
+begin
+  if (aHint <> ivPropertySetRef) or (Length(aArgs) <> 1) then exit;
+
+  var spec  := IUnknown(aArgs[0]) as ISpecification<TOrder>;
+  var title := ToTitle(aName);
+  var code  := CodeRegistry[aName];
+  var item  := TOrderReportItem.Create(aName, title, code, spec);
+
+  fItems.Add(item);
+end;
+
+// Adding report items dynamically
+
+report.HighValueOrders     := service.GetHighValueOrders;
+report.InternationalOrders := service.GetInternationalOrders;
+">
+                 DynamicObject
+              </a>
+              <a href="javascript:void(0)" 
+                 class="list-group-item list-group-item-action"
+                 data-bs-toggle="modal" 
+                 data-bs-target="#infoModal" 
+                 data-bs-title="Stream Example" 
+                 data-bs-text="{ using Stream to build the table rows }
+
+Stream
+  .From<TOrder>(Orders)
+  .Filter(item.Spec)
+  .ForEach(
+    procedure(const o: TOrder)
+    begin
+      var row := rowTemplate
+                    .Replace('[ID]',    o.Id.ToString)
+                    .Replace('[NAME]',  o.CustomerName)
+                    .Replace('[TOTAL]', o.TotalAmount.ToString)
+                    .Replace('[PAID]',  PAID[o.PaymentConfirmed])
+                    .Replace('[TEXT]',  TEXT[o.PaymentConfirmed]);
+      rows := rows + row;
+    end);">
+                 Stream
+              </a>    
+              <a href="javascript:void(0)" 
+                 class="list-group-item list-group-item-action"
+                 data-bs-toggle="modal" 
+                 data-bs-target="#infoModal" 
+                 data-bs-title="Scope Example" 
+                 data-bs-text="{ Scope manages the lifetime of the objects }
+
+var
+  scope: TScope;
+begin
+  var report  := scope.Owns(TOrderReport.Create);
+  var service := scope.Owns(TOrderService.Create);
+
+  // report and service are automatically cleaned up
+end;">
+                 Scope
+              </a>                    
+            </div>
+          </div>                 
+        </aside>
+        <main>
+            <section id="section1">
+  <div class="d-flex align-items-center">
+    <h5 class="mb-0 me-2 text-primary">High Value Orders</h5>
+
+     <i class="bi bi-info-circle text-primary"
+       style="font-size: 1.5rem; cursor: pointer;"
+       data-bs-toggle="modal"
+       data-bs-target="#infoModal"
+       data-bs-title="High Value Orders"
+       data-bs-text='{ Example 1: basic }
+
+// Order Service
+
+function TOrderService.GetHighValueOrders: ISpecification<TOrder>;
+begin
+  Result := TOrderTotalAtLeastSpecification.Create(1000.00);
+end;
+
+// Specifications
+
+function TOrderTotalAtLeastSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.TotalAmount >= fMinimumAmount;
+end;'></i>
+  </div>
+
+  <div class="table-responsive rounded shadow">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Customer Name</th>
+          <th>Total Amount</th>
+          <td>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+  <td>1002</td>
+  <td>Globex Corp</td>
+  <td>2499.99</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1005</td>
+  <td>Northwind Traders</td>
+  <td>1500</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1007</td>
+  <td>Pioneer Imports</td>
+  <td>3200.75</td>
+  <td><span class="badge "></span></td>
+</tr><tr>
+  <td>1010</td>
+  <td>Atlas Export BV</td>
+  <td>4120</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1013</td>
+  <td>Nordic Parts AB</td>
+  <td>1325.4</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1015</td>
+  <td>Urban House Ltd</td>
+  <td>2750</td>
+  <td><span class="badge "></span></td>
+</tr><tr>
+  <td>1016</td>
+  <td>Pacific Wholesale</td>
+  <td>5400.9</td>
+  <td><span class="badge "></span></td>
+</tr><tr>
+  <td>1018</td>
+  <td>Lighthouse Imports</td>
+  <td>1499.99</td>
+  <td><span class="badge "></span></td>
+</tr><tr>
+  <td>1020</td>
+  <td>Metro Office Supply</td>
+  <td>2220.75</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1023</td>
+  <td>Eastern Trade Co</td>
+  <td>3850</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1024</td>
+  <td>Prime Auto Parts</td>
+  <td>1105.1</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1026</td>
+  <td>Global Tech SARL</td>
+  <td>6200</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1028</td>
+  <td>Harbor Industrial</td>
+  <td>1750</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+<br><section id="section2">
+  <div class="d-flex align-items-center">
+    <h5 class="mb-0 me-2 text-primary">International Orders</h5>
+
+     <i class="bi bi-info-circle text-primary"
+       style="font-size: 1.5rem; cursor: pointer;"
+       data-bs-toggle="modal"
+       data-bs-target="#infoModal"
+       data-bs-title="International Orders"
+       data-bs-text='{ Example 2: basic }
+
+// Order Service
+
+function TOrderService.GetInternationalOrders: ISpecification<TOrder>;
+begin
+  Result := TInternationalOrderSpecification.Create;
+end;
+
+// Specifications
+
+function TInternationalOrderSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.IsInternational;
+end;'></i>
+  </div>
+
+  <div class="table-responsive rounded shadow">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Customer Name</th>
+          <th>Total Amount</th>
+          <td>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+  <td>1002</td>
+  <td>Globex Corp</td>
+  <td>2499.99</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1004</td>
+  <td>Blue Ocean GmbH</td>
+  <td>780</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1007</td>
+  <td>Pioneer Imports</td>
+  <td>3200.75</td>
+  <td><span class="badge "></span></td>
+</tr><tr>
+  <td>1010</td>
+  <td>Atlas Export BV</td>
+  <td>4120</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1013</td>
+  <td>Nordic Parts AB</td>
+  <td>1325.4</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1016</td>
+  <td>Pacific Wholesale</td>
+  <td>5400.9</td>
+  <td><span class="badge "></span></td>
+</tr><tr>
+  <td>1018</td>
+  <td>Lighthouse Imports</td>
+  <td>1499.99</td>
+  <td><span class="badge "></span></td>
+</tr><tr>
+  <td>1021</td>
+  <td>Delta Components</td>
+  <td>715.3</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1023</td>
+  <td>Eastern Trade Co</td>
+  <td>3850</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1026</td>
+  <td>Global Tech SARL</td>
+  <td>6200</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1028</td>
+  <td>Harbor Industrial</td>
+  <td>1750</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+<br><section id="section3">
+  <div class="d-flex align-items-center">
+    <h5 class="mb-0 me-2 text-primary">Confirmed High Value Orders</h5>
+
+     <i class="bi bi-info-circle text-primary"
+       style="font-size: 1.5rem; cursor: pointer;"
+       data-bs-toggle="modal"
+       data-bs-target="#infoModal"
+       data-bs-title="Confirmed High Value Orders"
+       data-bs-text='{ Example 3: intermediate }
+
+// Order Service
+
+function TOrderService.GetConfirmedHighValueOrders: ISpecification<TOrder>;
+begin
+  Result := TOrderTotalAtLeastSpecification.Create(1000.00)
+    .AndAlso(TPaymentConfirmedSpecification.Create);
+end;
+
+// Specifications
+
+function TOrderTotalAtLeastSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.TotalAmount >= fMinimumAmount;
+end;
+
+function TPaymentConfirmedSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.PaymentConfirmed;
+end;'></i>
+  </div>
+
+  <div class="table-responsive rounded shadow">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Customer Name</th>
+          <th>Total Amount</th>
+          <td>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+  <td>1002</td>
+  <td>Globex Corp</td>
+  <td>2499.99</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1005</td>
+  <td>Northwind Traders</td>
+  <td>1500</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1010</td>
+  <td>Atlas Export BV</td>
+  <td>4120</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1013</td>
+  <td>Nordic Parts AB</td>
+  <td>1325.4</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1020</td>
+  <td>Metro Office Supply</td>
+  <td>2220.75</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1023</td>
+  <td>Eastern Trade Co</td>
+  <td>3850</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1024</td>
+  <td>Prime Auto Parts</td>
+  <td>1105.1</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1026</td>
+  <td>Global Tech SARL</td>
+  <td>6200</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1028</td>
+  <td>Harbor Industrial</td>
+  <td>1750</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+<br><section id="section4">
+  <div class="d-flex align-items-center">
+    <h5 class="mb-0 me-2 text-primary">Priority International Orders</h5>
+
+     <i class="bi bi-info-circle text-primary"
+       style="font-size: 1.5rem; cursor: pointer;"
+       data-bs-toggle="modal"
+       data-bs-target="#infoModal"
+       data-bs-title="Priority International Orders"
+       data-bs-text='{ Example 4: intermediate }
+
+// Order Service
+
+function TOrderService.GetPriorityInternationalOrders: ISpecification<TOrder>;
+begin
+  Result := TPriorityCustomerSpecification.Create
+    .AndAlso(TInternationalOrderSpecification.Create);
+end;
+
+// Specifications
+
+function TPriorityCustomerSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.IsPriorityCustomer;
+end;
+
+function TInternationalOrderSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.IsInternational;
+end;'></i>
+  </div>
+
+  <div class="table-responsive rounded shadow">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Customer Name</th>
+          <th>Total Amount</th>
+          <td>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+  <td>1002</td>
+  <td>Globex Corp</td>
+  <td>2499.99</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1010</td>
+  <td>Atlas Export BV</td>
+  <td>4120</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1016</td>
+  <td>Pacific Wholesale</td>
+  <td>5400.9</td>
+  <td><span class="badge "></span></td>
+</tr><tr>
+  <td>1026</td>
+  <td>Global Tech SARL</td>
+  <td>6200</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+<br><section id="section5">
+  <div class="d-flex align-items-center">
+    <h5 class="mb-0 me-2 text-primary">Unconfirmed High Risk International Orders</h5>
+
+     <i class="bi bi-info-circle text-primary"
+       style="font-size: 1.5rem; cursor: pointer;"
+       data-bs-toggle="modal"
+       data-bs-target="#infoModal"
+       data-bs-title="Unconfirmed High Risk International Orders"
+       data-bs-text='{ Example 5: intermediate }
+
+// Order Service
+
+function TOrderService.GetHighRiskUnconfirmedInternationalOrders: ISpecification<TOrder>;
+begin
+  Result := THighRiskOrderSpecification.Create(40)
+    .AndAlso(TInternationalOrderSpecification.Create)
+    .AndAlso(TPaymentConfirmedSpecification.Create.NotThis);
+end;
+
+// Specifications
+
+function THighRiskOrderSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.RiskScore >= fMinimumRiskScore;
+end;
+
+function TInternationalOrderSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.IsInternational;
+end;
+
+function TPaymentConfirmedSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.PaymentConfirmed;
+end;'></i>
+  </div>
+
+  <div class="table-responsive rounded shadow">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Customer Name</th>
+          <th>Total Amount</th>
+          <td>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+  <td>1007</td>
+  <td>Pioneer Imports</td>
+  <td>3200.75</td>
+  <td><span class="badge "></span></td>
+</tr><tr>
+  <td>1016</td>
+  <td>Pacific Wholesale</td>
+  <td>5400.9</td>
+  <td><span class="badge "></span></td>
+</tr><tr>
+  <td>1018</td>
+  <td>Lighthouse Imports</td>
+  <td>1499.99</td>
+  <td><span class="badge "></span></td>
+</tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+<br><section id="section6">
+  <div class="d-flex align-items-center">
+    <h5 class="mb-0 me-2 text-primary">Orders Needing Special Handling</h5>
+
+     <i class="bi bi-info-circle text-primary"
+       style="font-size: 1.5rem; cursor: pointer;"
+       data-bs-toggle="modal"
+       data-bs-target="#infoModal"
+       data-bs-title="Orders Needing Special Handling"
+       data-bs-text='{ Example 6: intermediate }
+
+// Order Service
+
+function TOrderService.GetOrdersNeedingSpecialHandling: ISpecification<TOrder>;
+begin
+  Result := TFragileOrderSpecification.Create
+    .OrElse(TRequiresSignatureSpecification.Create);
+end;
+
+// Specifications
+
+function TFragileOrderSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.ContainsFragileItems;
+end;
+
+function TRequiresSignatureSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.RequiresSignature;
+end;'></i>
+  </div>
+
+  <div class="table-responsive rounded shadow">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Customer Name</th>
+          <th>Total Amount</th>
+          <td>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+  <td>1002</td>
+  <td>Globex Corp</td>
+  <td>2499.99</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1004</td>
+  <td>Blue Ocean GmbH</td>
+  <td>780</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1005</td>
+  <td>Northwind Traders</td>
+  <td>1500</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1007</td>
+  <td>Pioneer Imports</td>
+  <td>3200.75</td>
+  <td><span class="badge "></span></td>
+</tr><tr>
+  <td>1008</td>
+  <td>Evergreen Stores</td>
+  <td>640.4</td>
+  <td><span class="badge "></span></td>
+</tr><tr>
+  <td>1009</td>
+  <td>Red Maple Stores</td>
+  <td>210.25</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1010</td>
+  <td>Atlas Export BV</td>
+  <td>4120</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1012</td>
+  <td>Silverline Retail</td>
+  <td>980</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1013</td>
+  <td>Nordic Parts AB</td>
+  <td>1325.4</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1015</td>
+  <td>Urban House Ltd</td>
+  <td>2750</td>
+  <td><span class="badge "></span></td>
+</tr><tr>
+  <td>1016</td>
+  <td>Pacific Wholesale</td>
+  <td>5400.9</td>
+  <td><span class="badge "></span></td>
+</tr><tr>
+  <td>1017</td>
+  <td>Beacon Medical</td>
+  <td>860.45</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1018</td>
+  <td>Lighthouse Imports</td>
+  <td>1499.99</td>
+  <td><span class="badge "></span></td>
+</tr><tr>
+  <td>1021</td>
+  <td>Delta Components</td>
+  <td>715.3</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1023</td>
+  <td>Eastern Trade Co</td>
+  <td>3850</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1024</td>
+  <td>Prime Auto Parts</td>
+  <td>1105.1</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1025</td>
+  <td>Heritage Books</td>
+  <td>412.95</td>
+  <td><span class="badge "></span></td>
+</tr><tr>
+  <td>1026</td>
+  <td>Global Tech SARL</td>
+  <td>6200</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1027</td>
+  <td>Sunset Pharmacy</td>
+  <td>935.7</td>
+  <td><span class="badge "></span></td>
+</tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+<br><section id="section7">
+  <div class="d-flex align-items-center">
+    <h5 class="mb-0 me-2 text-primary">Orders Ready For Priority Fulfillment</h5>
+
+     <i class="bi bi-info-circle text-primary"
+       style="font-size: 1.5rem; cursor: pointer;"
+       data-bs-toggle="modal"
+       data-bs-target="#infoModal"
+       data-bs-title="Orders Ready For Priority Fulfillment"
+       data-bs-text='{ Example 7: advanced }
+
+// Order Service
+
+function TOrderService.GetOrdersReadyForPriorityFulfillment: ISpecification<TOrder>;
+begin
+  Result := TOrderTotalAtLeastSpecification.Create(1000.00)
+    .AndAlso(TPriorityCustomerSpecification.Create)
+    .AndAlso(TPaymentConfirmedSpecification.Create)
+    .AndAlso(THighRiskOrderSpecification.Create(40).NotThis);
+end;
+
+// Specifications
+
+function TOrderTotalAtLeastSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.TotalAmount >= fMinimumAmount;
+end;
+
+function TPriorityCustomerSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.IsPriorityCustomer;
+end;
+
+function TPaymentConfirmedSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.PaymentConfirmed;
+end;
+
+function THighRiskOrderSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.RiskScore >= fMinimumRiskScore;
+end;'></i>
+  </div>
+
+  <div class="table-responsive rounded shadow">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Customer Name</th>
+          <th>Total Amount</th>
+          <td>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+  <td>1002</td>
+  <td>Globex Corp</td>
+  <td>2499.99</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1005</td>
+  <td>Northwind Traders</td>
+  <td>1500</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1010</td>
+  <td>Atlas Export BV</td>
+  <td>4120</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1020</td>
+  <td>Metro Office Supply</td>
+  <td>2220.75</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1024</td>
+  <td>Prime Auto Parts</td>
+  <td>1105.1</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1026</td>
+  <td>Global Tech SARL</td>
+  <td>6200</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+<br><section id="section8">
+  <div class="d-flex align-items-center">
+    <h5 class="mb-0 me-2 text-primary">Premium International Orders</h5>
+
+     <i class="bi bi-info-circle text-primary"
+       style="font-size: 1.5rem; cursor: pointer;"
+       data-bs-toggle="modal"
+       data-bs-target="#infoModal"
+       data-bs-title="Premium International Orders"
+       data-bs-text='{ Example 8: advanced }
+
+// Order Service
+
+function TOrderService.GetPremiumInternationalOrders: ISpecification<TOrder>;
+begin
+  Result := TOrderTotalAtLeastSpecification.Create(1000.00)
+    .AndAlso(TInternationalOrderSpecification.Create)
+    .AndAlso(TPriorityCustomerSpecification.Create)
+    .AndAlso(TPaymentConfirmedSpecification.Create);
+end;
+
+// Specifications
+
+function TOrderTotalAtLeastSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.TotalAmount >= fMinimumAmount;
+end;
+
+function TInternationalOrderSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.IsInternational;
+end;
+
+function TPriorityCustomerSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.IsPriorityCustomer;
+end;
+
+function TPaymentConfirmedSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.PaymentConfirmed;
+end;'></i>
+  </div>
+
+  <div class="table-responsive rounded shadow">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Customer Name</th>
+          <th>Total Amount</th>
+          <td>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+  <td>1002</td>
+  <td>Globex Corp</td>
+  <td>2499.99</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1010</td>
+  <td>Atlas Export BV</td>
+  <td>4120</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1026</td>
+  <td>Global Tech SARL</td>
+  <td>6200</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+<br><section id="section9">
+  <div class="d-flex align-items-center">
+    <h5 class="mb-0 me-2 text-primary">Trusted Special Handling Orders</h5>
+
+     <i class="bi bi-info-circle text-primary"
+       style="font-size: 1.5rem; cursor: pointer;"
+       data-bs-toggle="modal"
+       data-bs-target="#infoModal"
+       data-bs-title="Trusted Special Handling Orders"
+       data-bs-text='{ Example 9: advanced }
+
+// Order Service
+
+function TOrderService.GetTrustedSpecialHandlingOrders: ISpecification<TOrder>;
+begin
+  Result := TPaymentConfirmedSpecification.Create
+    .AndAlso(THighRiskOrderSpecification.Create(40).NotThis)
+    .AndAlso(
+      TFragileOrderSpecification.Create
+        .OrElse(TRequiresSignatureSpecification.Create)
+    );
+end;
+
+// Specifications
+
+function TPaymentConfirmedSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.PaymentConfirmed;
+end;
+
+function THighRiskOrderSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.RiskScore >= fMinimumRiskScore;
+end;
+
+function TFragileOrderSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.ContainsFragileItems;
+end;
+
+function TRequiresSignatureSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.RequiresSignature;
+end;'></i>
+  </div>
+
+  <div class="table-responsive rounded shadow">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Customer Name</th>
+          <th>Total Amount</th>
+          <td>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+  <td>1002</td>
+  <td>Globex Corp</td>
+  <td>2499.99</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1004</td>
+  <td>Blue Ocean GmbH</td>
+  <td>780</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1005</td>
+  <td>Northwind Traders</td>
+  <td>1500</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1009</td>
+  <td>Red Maple Stores</td>
+  <td>210.25</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1010</td>
+  <td>Atlas Export BV</td>
+  <td>4120</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1012</td>
+  <td>Silverline Retail</td>
+  <td>980</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1017</td>
+  <td>Beacon Medical</td>
+  <td>860.45</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1024</td>
+  <td>Prime Auto Parts</td>
+  <td>1105.1</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr><tr>
+  <td>1026</td>
+  <td>Global Tech SARL</td>
+  <td>6200</td>
+  <td><span class="badge bg-success">paid</span></td>
+</tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+<br><section id="section10">
+  <div class="d-flex align-items-center">
+    <h5 class="mb-0 me-2 text-primary">Orders For Escalated Review</h5>
+
+     <i class="bi bi-info-circle text-primary"
+       style="font-size: 1.5rem; cursor: pointer;"
+       data-bs-toggle="modal"
+       data-bs-target="#infoModal"
+       data-bs-title="Orders For Escalated Review"
+       data-bs-text='{ Example 10: advanced }
+
+// Order Service
+
+function TOrderService.GetOrdersForEscalatedReview: ISpecification<TOrder>;
+begin
+  Result := TPaymentConfirmedSpecification.Create.NotThis
+    .AndAlso(
+      THighRiskOrderSpecification.Create(40)
+        .OrElse(TInternationalOrderSpecification.Create)
+    )
+    .AndAlso(TOrderTotalAtLeastSpecification.Create(1000.00));
+end;
+
+// Specifications
+
+function TPaymentConfirmedSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.PaymentConfirmed;
+end;
+
+function THighRiskOrderSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.RiskScore >= fMinimumRiskScore;
+end;
+
+function TInternationalOrderSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.IsInternational;
+end;
+
+function TOrderTotalAtLeastSpecification.IsSatisfiedBy(const aCandidate: TOrder): Boolean;
+begin
+  Result := aCandidate.TotalAmount >= fMinimumAmount;
+end;'></i>
+  </div>
+
+  <div class="table-responsive rounded shadow">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Customer Name</th>
+          <th>Total Amount</th>
+          <td>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+  <td>1007</td>
+  <td>Pioneer Imports</td>
+  <td>3200.75</td>
+  <td><span class="badge "></span></td>
+</tr><tr>
+  <td>1015</td>
+  <td>Urban House Ltd</td>
+  <td>2750</td>
+  <td><span class="badge "></span></td>
+</tr><tr>
+  <td>1016</td>
+  <td>Pacific Wholesale</td>
+  <td>5400.9</td>
+  <td><span class="badge "></span></td>
+</tr><tr>
+  <td>1018</td>
+  <td>Lighthouse Imports</td>
+  <td>1499.99</td>
+  <td><span class="badge "></span></td>
+</tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+<br>
+        </main>
+      </div>      
+    </div>    
+
+    <div class="modal fade" id="infoModal" tabindex="-1">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-dark text-muted border-secondary">
+            <h5 class="modal-title font-monospace" id="modalTitle">Source Code</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body p-0" style="background-color: #1a1d20;">
+            <pre class="m-0"><code id="modalContent" class="language-delphi">                 
+              <!-- Code is injected here -->
+            </code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const infoModal = document.getElementById('infoModal');
+
+      infoModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+
+        // 1. Get the data from the attributes
+        const titleText = button.getAttribute('data-bs-title');
+        const bodyText = button.getAttribute('data-bs-text');
+
+        // 2. Find the elements in the modal
+        const modalTitle = infoModal.querySelector('#modalTitle');
+
+        modalBody = infoModal.querySelector('#modalContent');
+        modalBody.className = 'language-delphi';
+
+        // 3. Inject the new content
+        modalTitle.textContent = titleText;
+        modalBody.textContent = bodyText;
+
+        delete modalBody.dataset.highlighted;
+
+        hljs.highlightElement(modalBody);
+      });
+    </script> 
+
+  </body>
+</html>
