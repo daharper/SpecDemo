@@ -6,7 +6,7 @@ uses
   App.Reports.OrderReport;
 
 type
-  TTemplate = (ttPage, ttLink, ttTable, ttRow);
+  TTemplate = (ttPage, ttLink, ttSection, ttRow);
 
   /// <summary>
   ///  Renders the order report and its items to HTML.
@@ -47,10 +47,10 @@ begin
   fStartupPath  := ExtractFilePath(ParamStr(0));
   fTemplatePath := TPath.Combine(fStartupPath, 'templates');
 
-  var pageTemplate  := GetTemplate(ttPage);
-  var linkTemplate  := GetTemplate(ttLink);
-  var tableTemplate := GetTemplate(ttTable);
-  var rowTemplate   := GetTemplate(ttRow);
+  var pageTemplate    := GetTemplate(ttPage);
+  var linkTemplate    := GetTemplate(ttLink);
+  var sectionTemplate := GetTemplate(ttSection);
+  var rowTemplate     := GetTemplate(ttRow);
 
   var content := '';
   var links   := '';
@@ -77,7 +77,7 @@ begin
 
     Inc(i);
 
-    var tbl := tableTemplate
+    var section := sectionTemplate
                     .Replace('[SEC_ID]', i.ToString)
                     .Replace('[TITLE]',  item.Title)
                     .Replace('[CODE]',   item.Code)
@@ -87,7 +87,7 @@ begin
                     .Replace('[SEC_ID]', i.ToString)
                     .Replace('[TITLE]',  item.Title);
 
-    content := content + tbl;
+    content := content + section;
     links := links + lnk;
   end;
 

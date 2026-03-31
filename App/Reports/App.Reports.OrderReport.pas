@@ -10,7 +10,7 @@ uses
   Domain.Orders.Order;
 
 type
-  IOrderReportItem = interface
+  IOrderReportSection = interface
     ['{3581D542-90E1-428C-BF09-ECEA3D51706E}']
     function Name: string;
     function Title: string;
@@ -21,7 +21,7 @@ type
   /// <summary>
   ///  Represents a section of the report, for example: international orders.
   /// </summary>
-  TOrderReportItem = class(TInterfacedObject, IOrderReportItem)
+  TOrderReportSection = class(TInterfacedObject, IOrderReportSection)
   private
     fName:  string;
     fTitle: string;
@@ -37,15 +37,15 @@ type
   end;
 
   /// <summary>
-  ///  Represents the order report, contains a number of report items.
+  ///  Represents the order report, contains a number of report sections.
   /// </summary>
   TOrderReport = class(TDynamicObject)
   private
-    fItems: TList<IOrderReportItem>;
+    fSections: TList<IOrderReportSection>;
 
     function ToTitle(const aTitle: string): string;
   public
-    function GetEnumerator: TEnumerator<IOrderReportItem>;
+    function GetEnumerator: TEnumerator<IOrderReportSection>;
     function MethodMissing(const aName: string; const aHint: TInvokeHint; const aArgs: TArray<Variant>): Variant; override;
 
     constructor Create;
@@ -71,15 +71,16 @@ begin
   var spec  := IUnknown(aArgs[0]) as ISpecification<TOrder>;
   var title := ToTitle(aName);
   var code  := CodeRegistry[aName];
-  var item  := TOrderReportItem.Create(aName, title, code, spec);
 
-  fItems.Add(item);
+  var section := TOrderReportSection.Create(aName, title, code, spec);
+
+  fSections.Add(section);
 end;
 
 {----------------------------------------------------------------------------------------------------------------------}
-function TOrderReport.GetEnumerator: TEnumerator<IOrderReportItem>;
+function TOrderReport.GetEnumerator: TEnumerator<IOrderReportSection>;
 begin
-  Result := fItems.GetEnumerator;
+  Result := fSections.GetEnumerator;
 end;
 
 {----------------------------------------------------------------------------------------------------------------------}
@@ -97,13 +98,13 @@ end;
 {----------------------------------------------------------------------------------------------------------------------}
 constructor TOrderReport.Create;
 begin
-  fItems := TList<IOrderReportItem>.Create;
+  fSections := TList<IOrderReportSection>.Create;
 end;
 
 {----------------------------------------------------------------------------------------------------------------------}
 destructor TOrderReport.Destroy;
 begin
-  fItems.Free;
+  fSections.Free;
 
   inherited;
 end;
@@ -114,10 +115,10 @@ begin
   Result := TOrderReport.Create.AsDynamic;
 end;
 
-{ TOrderReportItem }
+{ TOrderReportSection }
 
 {----------------------------------------------------------------------------------------------------------------------}
-constructor TOrderReportItem.Create(const aName: string; const aTitle: string; const aCode: string; const aSpec: ISpecification<TOrder>);
+constructor TOrderReportSection.Create(const aName: string; const aTitle: string; const aCode: string; const aSpec: ISpecification<TOrder>);
 begin
   fName  := aName;
   fTitle := aTitle;
@@ -126,25 +127,25 @@ begin
 end;
 
 {----------------------------------------------------------------------------------------------------------------------}
-function TOrderReportItem.Name: string;
+function TOrderReportSection.Name: string;
 begin
   Result := fName;
 end;
 
 {----------------------------------------------------------------------------------------------------------------------}
-function TOrderReportItem.Title: string;
+function TOrderReportSection.Title: string;
 begin
   Result := fTitle;
 end;
 
 {----------------------------------------------------------------------------------------------------------------------}
-function TOrderReportItem.Code: string;
+function TOrderReportSection.Code: string;
 begin
   Result := fCode;
 end;
 
 {----------------------------------------------------------------------------------------------------------------------}
-function TOrderReportItem.Spec: ISpecification<TOrder>;
+function TOrderReportSection.Spec: ISpecification<TOrder>;
 begin
   Result := fSpec;
 end;
