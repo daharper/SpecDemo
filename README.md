@@ -1,5 +1,4 @@
 # Specification Pattern in Delphi
-[Please see here for more](https://www.beyondvelocity.com/114)
 
 A simple demon on using the Specification Pattern in Delphi to make business rules easier to read, reuse, and compose.
 
